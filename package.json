@@ -1,0 +1,22 @@
+{
+  "name": "ps-tanks",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "webpack:server": "webpack-dev-server --progress --inline --hot",
+    "start": "yarn webpack:server"
+  },
+  "author": "Joshua Grosso",
+  "dependencies": {},
+  "devDependencies": {
+    "create-react-class": "^15.6.3",
+    "purescript": "^0.11.7",
+    "purescript-psa": "^0.6.0",
+    "purs-loader": "^3.1.4",
+    "react": "^16.3.1",
+    "react-dom": "^16.3.1",
+    "webpack": "^4.5.0",
+    "webpack-cli": "^2.0.14",
+    "webpack-dev-server": "^3.1.1"
+  }
+}
