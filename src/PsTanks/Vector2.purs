@@ -2,7 +2,7 @@ module PsTanks.Vector2 where
 
 import Prelude
 
-import PsTanks.Lens (class HasX, class HasY, _x, _y)
+import Lens (class HasX, class HasY, _x, _y)
 
 import Optic.Getter ((^.))
 import Optic.Lens (lens)

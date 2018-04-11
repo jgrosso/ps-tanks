@@ -1,10 +1,11 @@
-module PsTanks.GameControls where
+module PsTanks.Controls where
 
-import PsTanks.Controls (Control(Control))
-import PsTanks.GameEvent (Event(PlayerRotate, PlayerTranslate), RotateDirection(Clockwise, Counterclockwise), TranslateDirection(Backward, Forward))
-import PsTanks.InputsState (KeyCode(KeyCode))
+import PsGame.Controls (Control(Control))
+import PsGame.InputsState (KeyCode(KeyCode))
 
-controls ∷ Array Control
+import PsTanks.Event (Event(PlayerRotate, PlayerTranslate), RotateDirection(Clockwise, Counterclockwise), TranslateDirection(Backward, Forward))
+
+controls ∷ Array (Control Event)
 controls =
   [ Control { trigger: KeyCode "KeyA", action: PlayerRotate Counterclockwise }
   , Control { trigger: KeyCode "KeyD", action: PlayerRotate Clockwise }

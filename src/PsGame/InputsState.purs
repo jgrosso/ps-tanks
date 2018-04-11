@@ -1,14 +1,14 @@
-module PsTanks.InputsState where
+module PsGame.InputsState where
 
 import Prelude
 
 import Data.Monoid (mempty)
 import Data.Set (Set)
 
+import Lens (class HasKeysDown)
+
 import Optic.Lens (lens)
 import Optic.Types (Lens')
-
-import PsTanks.Lens (class HasKeysDown)
 
 newtype KeyCode =
   KeyCode String

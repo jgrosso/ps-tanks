@@ -1,4 +1,4 @@
-module PsTanks.Utils where
+module PsGame.Utils where
 
 import Data.Array (elem)
 

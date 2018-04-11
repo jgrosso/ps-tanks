@@ -1,9 +1,10 @@
-module PsTanks.GameState where
+module PsTanks.State where
 
 import Prelude
 
+import Lens (class HasPlayer, class HasPosition, class HasRotation)
+
 import PsTanks.Angle (Degrees, deg)
-import PsTanks.Lens (class HasPlayer, class HasPosition, class HasRotation)
 import PsTanks.Vector2 (Vector2)
 
 import Optic.Lens (lens)

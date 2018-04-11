@@ -1,9 +1,11 @@
-module PsTanks.GameEvent where
+module PsTanks.Event where
 
 import Prelude
 
 import Data.Int (round)
 import Data.Newtype (unwrap)
+
+import Lens (_player, _position, _rotation)
 
 import Math (cos, sin)
 
@@ -12,8 +14,7 @@ import Optic.Getter ((^.))
 import Optic.Setter ((+~))
 
 import PsTanks.Angle (Degrees, deg, degreesToRadians)
-import PsTanks.GameState (State)
-import PsTanks.Lens (_player, _position, _rotation)
+import PsTanks.State (State)
 import PsTanks.Vector2 (Vector2(Vector2))
 
 import Pux (EffModel, noEffects)

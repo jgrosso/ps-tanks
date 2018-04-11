@@ -1,4 +1,4 @@
-module PsTanks.Lens where
+module Lens where
 
 import Optic.Types (Lens')
 

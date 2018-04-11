@@ -1,4 +1,4 @@
-module PsTanks.GameView where
+module PsTanks.View where
 
 import Prelude hiding (div, top)
 
@@ -15,12 +15,14 @@ import Data.Newtype (unwrap)
 
 import DOM.Event.KeyboardEvent (eventToKeyboardEvent)
 
+import Lens (_player, _position, _rotation, _x, _y)
+
 import Optic.Core ((..))
 import Optic.Getter ((^.))
 
-import PsTanks.GameState (State)
-import PsTanks.InputsEvent (InputsEvent(KeyDown, KeyUp, Noop))
-import PsTanks.Lens (_player, _position, _rotation, _x, _y)
+import PsGame.InputsEvent (InputsEvent(KeyDown, KeyUp, Noop))
+
+import PsTanks.State (State)
 
 import Pux.DOM.Events (onKeyDown, onKeyUp)
 import Pux.DOM.HTML (HTML)

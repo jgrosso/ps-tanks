@@ -1,5 +1,5 @@
 import {
   main
-} from '../src/Main.purs';
+} from '../src/PsTanks/Main.purs';
 
 main();

@@ -1,17 +1,17 @@
-module PsTanks.InputsEvent where
+module PsGame.InputsEvent where
 
 import Prelude
 
-import Data.Int (round)
 import Data.Set (delete, insert)
 
-import DOM.Event.KeyboardEvent (code, eventToKeyboardEvent)
+import DOM.Event.KeyboardEvent (code)
 import DOM.Event.Types (KeyboardEvent)
+
+import Lens (_keysDown)
 
 import Optic.Setter ((%~))
 
-import PsTanks.InputsState (InputsState, KeyCode(KeyCode))
-import PsTanks.Lens (_keysDown)
+import PsGame.InputsState (InputsState, KeyCode(KeyCode))
 
 data InputsEvent
   = KeyDown KeyboardEvent
