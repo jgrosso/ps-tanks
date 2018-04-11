@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "webpack:server": "webpack-dev-server --progress --inline --hot",
+    "webpack:server": "webpack-dev-server --progress --inline --hot --mode development",
     "start": "yarn webpack:server"
   },
   "author": "Joshua Grosso",
