@@ -27,10 +27,9 @@ const plugins =
 module.exports = {
   devtool: 'eval-source-map',
 
-  devServer: {
-    contentBase: '.',
-    port: 4000,
-    stats: 'errors-only'
+  mode: 'development',
+  serve: {
+    hot: true
   },
 
   entry: './src/index.js',
