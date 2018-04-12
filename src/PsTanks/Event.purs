@@ -2,10 +2,7 @@ module PsTanks.Event where
 
 import Prelude
 
-import Data.Int (round)
 import Data.Newtype (unwrap)
-
-import Debug.Trace (traceShow)
 
 import Lens (_player, _position, _rotation)
 
@@ -36,10 +33,13 @@ data TranslateDirection
   | Forward
 
 data Event
-  = PlayerRotate RotateDirection
+  = MoveBullets
+  | PlayerRotate RotateDirection
   | PlayerTranslate TranslateDirection
 
 update ∷ ∀ e. Event → State → EffModel State Event e
+update MoveBullets state =
+  noEffects state
 update (PlayerRotate rotateDirection) state =
   let
     sign ∷ Number

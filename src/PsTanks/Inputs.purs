@@ -1,9 +1,11 @@
-module PsTanks.Controls where
+module PsTanks.Inputs where
+
+import Prelude
 
 import PsGame.Controls (Control(Control))
-import PsGame.InputsState (KeyCode(KeyCode))
+import PsGame.InputsState (InputsState, KeyCode(KeyCode))
 
-import PsTanks.Event (Event(PlayerRotate, PlayerTranslate), RotateDirection(Clockwise, Counterclockwise), TranslateDirection(Backward, Forward))
+import PsTanks.Event (Event(MoveBullets, PlayerRotate, PlayerTranslate), RotateDirection(Clockwise, Counterclockwise), TranslateDirection(Backward, Forward))
 
 controls ∷ Array (Control Event)
 controls =
@@ -12,3 +14,7 @@ controls =
   , Control { trigger: KeyCode "KeyS", action: PlayerTranslate Backward }
   , Control { trigger: KeyCode "KeyW", action: PlayerTranslate Forward }
   ]
+
+deriveEvents ∷ InputsState → Array Event
+deriveEvents =
+  const [MoveBullets]

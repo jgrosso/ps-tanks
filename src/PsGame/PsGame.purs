@@ -29,6 +29,8 @@ import Text.Smolder.Markup (mapEvent)
 
 type GameControls gameEvent =
   Array (Control gameEvent)
+type GameDeriveEvents gameEvent =
+  InputsState → Array gameEvent
 type GameUpdate gameEvent gameState effects =
   gameEvent → gameState → EffModel gameState gameEvent effects
 type GameView gameState =
@@ -71,20 +73,21 @@ gameEffectToEffect =
 makeFoldp
   ∷ ∀ gameEvent gameState effects
   . GameControls gameEvent
+  → GameDeriveEvents gameEvent
   → GameUpdate gameEvent gameState effects
   → Event gameEvent
   → State gameState
   → EffModel (State gameState) (Event gameEvent) effects
-makeFoldp gameControls gameUpdate (GameEvent gameEvent) state =
+makeFoldp _ _ gameUpdate (GameEvent gameEvent) state =
   updateGameState gameUpdate state [gameEvent]
-makeFoldp gameControls gameUpdate (InputsEvent inputsEvent) state =
+makeFoldp _ _ _ (InputsEvent inputsEvent) state =
   noEffects $
     state#_inputsState %~ foldpInputsEvent inputsEvent
-makeFoldp gameControls gameUpdate Tick state =
+makeFoldp gameControls gameDeriveEvents gameUpdate Tick state =
   let
     gameEvents ∷ Array gameEvent
     gameEvents =
-      deriveGameEvents gameControls (state^._inputsState)
+      deriveGameEvents gameControls (state^._inputsState) <> gameDeriveEvents (state^._inputsState)
   in
     updateGameState gameUpdate state gameEvents
 
@@ -151,16 +154,17 @@ start
   ∷ ∀ gameEvent gameState effects
   . gameState
   → GameControls gameEvent
+  → GameDeriveEvents gameEvent
   → GameUpdate gameEvent gameState effects
   → GameView gameState
   → Eff (CoreEffects effects) Unit
-start gameInitialState gameControls gameUpdate gameView =
+start gameInitialState gameControls gameDeriveEvents gameUpdate gameView =
   do
     let tick = every (10.0 * millisecond) $> Tick
     app ← Pux.start
       { initialState: makeInitialState gameInitialState
       , view: makeView gameView
-      , foldp: makeFoldp gameControls gameUpdate
+      , foldp: makeFoldp gameControls gameDeriveEvents gameUpdate
       , inputs: [tick]
       }
     renderToDOM "#app" app.markup app.input

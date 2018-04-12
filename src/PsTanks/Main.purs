@@ -2,8 +2,8 @@ module PsTanks.Main where
 
 import PsGame (Game, start)
 
-import PsTanks.Controls (controls)
 import PsTanks.Event (update)
+import PsTanks.Inputs (deriveEvents, controls)
 import PsTanks.State (initialState)
 import PsTanks.View (view)
 
@@ -12,5 +12,6 @@ main =
   start
     initialState
     controls
+    deriveEvents
     update
     view
