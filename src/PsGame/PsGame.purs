@@ -156,7 +156,7 @@ start
   → Eff (CoreEffects effects) Unit
 start gameInitialState gameControls gameUpdate gameView =
   do
-    let tick = every (50.0 * millisecond) $> Tick
+    let tick = every (10.0 * millisecond) $> Tick
     app ← Pux.start
       { initialState: makeInitialState gameInitialState
       , view: makeView gameView

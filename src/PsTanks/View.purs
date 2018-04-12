@@ -10,7 +10,6 @@ import CSS.Size (deg, px, vh, vw)
 import CSS.Transform (rotate, transform)
 
 import Data.Either (either)
-import Data.Int (toNumber)
 import Data.Newtype (unwrap)
 
 import DOM.Event.KeyboardEvent (eventToKeyboardEvent)
@@ -51,7 +50,7 @@ view state =
       div
         ! style do
             position absolute
-            left $ toNumber (state^._player.._position.._x) # px
-            top $ -(toNumber (state^._player.._position.._y)) # px
+            left $ state^._player.._position.._x # px
+            top $ -(state^._player.._position.._y) # px
             transform $ rotate (unwrap (state^._player.._rotation) # deg)
         $ text "Tank"

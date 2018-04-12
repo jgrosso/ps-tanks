@@ -11,19 +11,19 @@ import Optic.Types (Lens')
 
 newtype Vector2 =
   Vector2
-  { x ∷ Int
-  , y ∷ Int
+  { x ∷ Number
+  , y ∷ Number
   }
 
-instance hasXVector2 ∷ HasX Vector2 Int where
-  _x ∷ Lens' Vector2 Int
+instance hasXVector2 ∷ HasX Vector2 Number where
+  _x ∷ Lens' Vector2 Number
   _x =
     lens
       (\(Vector2 o) -> o.x)
       (\(Vector2 o) -> Vector2 <<< o { x = _ })
 
-instance hasYVector2 ∷ HasY Vector2 Int where
-  _y ∷ Lens' Vector2 Int
+instance hasYVector2 ∷ HasY Vector2 Number where
+  _y ∷ Lens' Vector2 Number
   _y =
     lens
       (\(Vector2 o) -> o.y)
@@ -38,8 +38,8 @@ instance semiringVector2 ∷ Semiring Vector2 where
   zero ∷ Vector2
   zero =
     Vector2
-    { x: 0
-    , y: 0
+    { x: 0.0
+    , y: 0.0
     }
 
   mul ∷ Vector2 → Vector2 → Vector2
@@ -50,7 +50,7 @@ instance semiringVector2 ∷ Semiring Vector2 where
   one ∷ Vector2
   one =
     Vector2
-    { x: 1
-    , y: 1
+    { x: 1.0
+    , y: 1.0
     }
 

@@ -5,6 +5,8 @@ import Prelude
 import Data.Int (round)
 import Data.Newtype (unwrap)
 
+import Debug.Trace (traceShow)
+
 import Lens (_player, _position, _rotation)
 
 import Math (cos, sin)
@@ -20,10 +22,10 @@ import PsTanks.Vector2 (Vector2(Vector2))
 import Pux (EffModel, noEffects)
 
 playerRotateSpeed ∷ Number
-playerRotateSpeed = 10.0
+playerRotateSpeed = 3.0
 
 playerMoveSpeed ∷ Number
-playerMoveSpeed = 3.0
+playerMoveSpeed = 1.1
 
 data RotateDirection
   = Clockwise
@@ -67,8 +69,8 @@ update (PlayerTranslate translateDirection) state =
     playerPositionΔ ∷ Vector2
     playerPositionΔ =
       Vector2
-      { x: round $ playerMoveSpeed * sign * cos (-playerRotationRadians)
-      , y: round $ playerMoveSpeed * sign * sin (-playerRotationRadians)
+      { x: playerMoveSpeed * sign * cos (-playerRotationRadians)
+      , y: playerMoveSpeed * sign * sin (-playerRotationRadians)
       }
   in
     noEffects $
