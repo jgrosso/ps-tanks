@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "webpack:serve": "webpack-serve",
+    "webpack:serve": "yarn webpack-serve --hot",
     "start": "yarn webpack:server"
   },
   "author": "Joshua Grosso",
