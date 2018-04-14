@@ -28,9 +28,9 @@ import Pux.DOM.Events (onKeyDown, onKeyUp)
 import Pux.DOM.HTML (HTML)
 import Pux.DOM.HTML.Attributes (style)
 
-import Text.Smolder.HTML (div)
-import Text.Smolder.HTML.Attributes (tabindex)
-import Text.Smolder.Markup ((!), (#!), text)
+import Text.Smolder.HTML (div, img)
+import Text.Smolder.HTML.Attributes (src, tabindex)
+import Text.Smolder.Markup ((!), (#!))
 
 view ∷ State → HTML InputsEvent
 view state =
@@ -48,7 +48,9 @@ view state =
           either (const Noop) KeyUp)
 
     $ do
-      viewEntity (state^._player) (text "Tank")
+      viewEntity (state^._player)
+        $ img
+          ! src "./img/tank.png"
 
 viewEntity
   ∷ ∀ entity event

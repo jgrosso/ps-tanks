@@ -19,7 +19,7 @@ import PsTanks.Vector2 (Vector2(Vector2))
 import Pux (EffModel, noEffects)
 
 playerRotateSpeed ∷ Number
-playerRotateSpeed = 3.0
+playerRotateSpeed = 0.5
 
 playerMoveSpeed ∷ Number
 playerMoveSpeed = 1.1
