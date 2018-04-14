@@ -10,18 +10,20 @@ import CSS.Size (deg, px, vh, vw)
 import CSS.Transform (rotate, transform)
 
 import Data.Either (either)
-import Data.Newtype (unwrap)
+import Debug.Trace (traceAny)
 
 import DOM.Event.KeyboardEvent (eventToKeyboardEvent)
 
-import Lens (_player, _position, _rotation, _x, _y)
+import Lens (class HasPosition, class HasRotation, _player, _position, _rotation, _x, _y)
 
 import Optic.Core ((..))
 import Optic.Getter ((^.))
 
 import PsGame.InputsEvent (InputsEvent(KeyDown, KeyUp, Noop))
 
+import PsTanks.Angle (Degrees, toCssAngle)
 import PsTanks.State (State)
+import PsTanks.Vector2 (Vector2)
 
 import Pux.DOM.Events (onKeyDown, onKeyUp)
 import Pux.DOM.HTML (HTML)
@@ -47,10 +49,20 @@ view state =
           either (const Noop) KeyUp)
 
     $ do
-      div
-        ! style do
-            position absolute
-            left $ state^._player.._position.._x # px
-            top $ -(state^._player.._position.._y) # px
-            transform $ rotate (unwrap (state^._player.._rotation) # deg)
-        $ text "Tank"
+      viewEntity (state^._player) (text "Tank")
+
+viewEntity
+  ∷ ∀ entity event
+  . HasPosition entity Vector2
+  ⇒ HasRotation entity Degrees
+  ⇒ entity
+  → HTML event
+  → HTML event
+viewEntity entity entityHtml =
+  div
+    ! style do
+        position absolute
+        left $ (entity^._position.._x) # px
+        top $ -(entity^._position.._y) # px
+        transform $ rotate (toCssAngle (entity^._rotation))
+    $ entityHtml
