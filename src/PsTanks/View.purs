@@ -6,11 +6,10 @@ import Control.Monad.Except (runExcept)
 
 import CSS.Display (absolute, position)
 import CSS.Geometry (height, left, top, width)
-import CSS.Size (deg, px, vh, vw)
+import CSS.Size (px, vh, vw)
 import CSS.Transform (rotate, transform)
 
 import Data.Either (either)
-import Debug.Trace (traceAny)
 
 import DOM.Event.KeyboardEvent (eventToKeyboardEvent)
 
