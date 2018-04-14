@@ -5,6 +5,9 @@ import Optic.Types (Lens')
 class HasAction a r | a → r where
   _action ∷ Lens' a r
 
+class HasBullets a r | a → r where
+  _bullets ∷ Lens' a r
+
 class HasGameState a r | a → r where
   _gameState ∷ Lens' a r
 
