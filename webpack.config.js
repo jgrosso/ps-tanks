@@ -28,9 +28,6 @@ module.exports = {
   devtool: 'eval-source-map',
 
   mode: 'development',
-  serve: {
-    hot: true
-  },
 
   entry: './src/index.js',
 
