@@ -1,4 +1,4 @@
-module PsTanks.Angle where
+module PsTanks.Data.Angle where
 
 import Prelude
 

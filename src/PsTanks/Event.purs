@@ -2,24 +2,28 @@ module PsTanks.Event where
 
 import Prelude
 
-import Data.Newtype (unwrap)
+import Data.Array (cons)
 
-import Lens (_player, _position, _rotation)
-
-import Math (cos, sin)
+import Lens (_bullets, _player, _position, _rotation)
 
 import Optic.Core ((..))
 import Optic.Getter ((^.))
-import Optic.Setter ((+~))
+import Optic.Setter ((%~), (+~))
 
-import PsTanks.Angle (Degrees, deg, degreesToRadians)
-import PsTanks.State (State)
-import PsTanks.Vector2 (Vector2(Vector2))
-
+import PsTanks.Data.Angle (Degrees, deg, degreesToRadians)
+import PsTanks.Data.Coordinate (Coordinate(Coordinate))
+import PsTanks.Data.Dimensions (Dimensions(Dimensions))
+import PsTanks.Data.Url (Url(Url))
+import PsTanks.Data.Vector2 (Vector2(Vector2), polarToCartesian)
+import PsTanks.Image (Image(Image), centerRight)
+import PsTanks.State (Bullet(Bullet), State)
 import Pux (EffModel, noEffects)
 
+bulletMoveSpeed ∷ Number
+bulletMoveSpeed = 0.5
+
 playerRotateSpeed ∷ Number
-playerRotateSpeed = 0.5
+playerRotateSpeed = 1.0
 
 playerMoveSpeed ∷ Number
 playerMoveSpeed = 1.1
@@ -33,13 +37,45 @@ data TranslateDirection
   | Forward
 
 data Event
-  = MoveBullets
+  = FireBullet
+  | MoveBullets
   | PlayerRotate RotateDirection
   | PlayerTranslate TranslateDirection
 
 update ∷ ∀ e. Event → State → EffModel State Event e
+update FireBullet state =
+  let
+    newBullet ∷ Bullet
+    newBullet =
+      Bullet
+      { image:
+        Image
+        { dimensions:
+          Dimensions $ Vector2
+          { x: 25.0
+          , y: 10.0
+          }
+        , sourceUrl: Url "./img/bullet.png"
+        }
+      , position: centerRight $ state^._player
+      , rotation: state^._player.._rotation
+      }
+  in
+    noEffects $
+      state#_bullets %~ cons newBullet
 update MoveBullets state =
-  noEffects state
+  noEffects $
+    state#_bullets %~ map moveBullet
+  where
+    moveBullet ∷ Bullet → Bullet
+    moveBullet bullet =
+      let
+        bulletPositionΔ :: Coordinate
+        bulletPositionΔ =
+          Coordinate $
+            polarToCartesian bulletMoveSpeed (degreesToRadians $ bullet^._rotation)
+      in
+        bullet#_position +~ bulletPositionΔ
 update (PlayerRotate rotateDirection) state =
   let
     sign ∷ Number
@@ -62,16 +98,10 @@ update (PlayerTranslate translateDirection) state =
         Backward → -1.0
         Forward → 1.0
 
-    playerRotationRadians ∷ Number
-    playerRotationRadians =
-      unwrap $ degreesToRadians $ state^._player.._rotation
-
-    playerPositionΔ ∷ Vector2
+    playerPositionΔ ∷ Coordinate
     playerPositionΔ =
-      Vector2
-      { x: playerMoveSpeed * sign * cos (-playerRotationRadians)
-      , y: playerMoveSpeed * sign * sin (-playerRotationRadians)
-      }
+      Coordinate $
+        polarToCartesian (sign * playerMoveSpeed) (degreesToRadians $ state^._player.._rotation)
   in
     noEffects $
       state#_player.._position +~ playerPositionΔ

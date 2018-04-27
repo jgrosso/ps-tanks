@@ -2,22 +2,34 @@ module PsTanks.State where
 
 import Prelude
 
-import Lens (class HasBullets, class HasPlayer, class HasPosition, class HasRotation)
+import Lens (class HasBullets, class HasImage, class HasPlayer, class HasPosition, class HasRotation)
 
-import PsTanks.Angle (Degrees, deg)
-import PsTanks.Vector2 (Vector2)
+import PsTanks.Data.Angle (Degrees, deg)
+import PsTanks.Data.Coordinate (Coordinate)
+import PsTanks.Data.Dimensions (Dimensions(Dimensions))
+import PsTanks.Data.Url (Url(Url))
+import PsTanks.Data.Vector2 (Vector2(Vector2))
+import PsTanks.Image (Image(Image))
 
 import Optic.Lens (lens)
 import Optic.Types (Lens')
 
 newtype Bullet =
   Bullet
-  { position ∷ Vector2
+  { image ∷ Image
+  , position ∷ Coordinate
   , rotation ∷ Degrees
   }
 
-instance hasPositionBullet ∷ HasPosition Bullet Vector2 where
-  _position ∷ Lens' Bullet Vector2
+instance hasImageBullet ∷ HasImage Bullet Image where
+  _image ∷ Lens' Bullet Image
+  _image =
+    lens
+      (\(Bullet o) → o.image)
+      (\(Bullet o) → Bullet <<< o { image = _ })
+
+instance hasPositionBullet ∷ HasPosition Bullet Coordinate where
+  _position ∷ Lens' Bullet Coordinate
   _position =
     lens
       (\(Bullet o) → o.position)
@@ -32,12 +44,20 @@ instance hasRotationBullet ∷ HasRotation Bullet Degrees where
 
 newtype PlayerState =
   PlayerState
-  { position ∷ Vector2
+  { image ∷ Image
+  , position ∷ Coordinate
   , rotation ∷ Degrees
   }
 
-instance hasPositionPlayerState ∷ HasPosition PlayerState Vector2 where
-  _position ∷ Lens' PlayerState Vector2
+instance hasImagePlayerState ∷ HasImage PlayerState Image where
+  _image ∷ Lens' PlayerState Image
+  _image =
+    lens
+      (\(PlayerState o) → o.image)
+      (\(PlayerState o) → PlayerState <<< o { image = _ })
+
+instance hasPositionPlayerState ∷ HasPosition PlayerState Coordinate where
+  _position ∷ Lens' PlayerState Coordinate
   _position =
     lens
       (\(PlayerState o) → o.position)
@@ -76,7 +96,16 @@ initialState =
   { bullets: []
   , player:
     PlayerState
-    { position: zero
+    { image:
+      Image
+      { dimensions:
+        Dimensions $ Vector2
+        { x: 100.0
+        , y: 50.0
+        }
+      , sourceUrl: Url "./img/tank.png"
+      }
+    , position: zero
     , rotation: 0.0 # deg
     }
   }

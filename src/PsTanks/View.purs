@@ -10,19 +10,22 @@ import CSS.Size (px, vh, vw)
 import CSS.Transform (rotate, transform)
 
 import Data.Either (either)
+import Data.Foldable (for_)
+import Data.Newtype (unwrap)
 
 import DOM.Event.KeyboardEvent (eventToKeyboardEvent)
 
-import Lens (class HasPosition, class HasRotation, _player, _position, _rotation, _x, _y)
+import Lens (class HasImage, class HasPosition, class HasRotation, _bullets, _dimensions, _image, _player, _position, _rotation, _sourceUrl, _x, _y)
 
 import Optic.Core ((..))
 import Optic.Getter ((^.))
 
 import PsGame.InputsEvent (InputsEvent(KeyDown, KeyUp, Noop))
 
-import PsTanks.Angle (Degrees, toCssAngle)
+import PsTanks.Data.Angle (Degrees, toCssAngle)
+import PsTanks.Data.Coordinate (Coordinate)
+import PsTanks.Image (Image)
 import PsTanks.State (State)
-import PsTanks.Vector2 (Vector2)
 
 import Pux.DOM.Events (onKeyDown, onKeyUp)
 import Pux.DOM.HTML (HTML)
@@ -30,6 +33,7 @@ import Pux.DOM.HTML.Attributes (style)
 
 import Text.Smolder.HTML (div, img)
 import Text.Smolder.HTML.Attributes (src, tabindex)
+import Text.Smolder.HTML.Attributes as Html
 import Text.Smolder.Markup ((!), (#!))
 
 view ∷ State → HTML InputsEvent
@@ -48,22 +52,24 @@ view state =
           either (const Noop) KeyUp)
 
     $ do
-      viewEntity (state^._player)
-        $ img
-          ! src "./img/tank.png"
+        viewEntity (state^._player)
+        for_ (state^._bullets) viewEntity
 
 viewEntity
   ∷ ∀ entity event
-  . HasPosition entity Vector2
+  . HasImage entity Image
+  ⇒ HasPosition entity Coordinate
   ⇒ HasRotation entity Degrees
   ⇒ entity
   → HTML event
-  → HTML event
-viewEntity entity entityHtml =
+viewEntity entity =
   div
     ! style do
         position absolute
         left $ (entity^._position.._x) # px
         top $ -(entity^._position.._y) # px
         transform $ rotate (toCssAngle (entity^._rotation))
-    $ entityHtml
+    $ img
+        ! Html.width (show $ entity^._image.._dimensions.._x)
+        ! Html.height (show $ entity^._image.._dimensions.._y)
+        ! src (unwrap $ entity^._image.._sourceUrl)

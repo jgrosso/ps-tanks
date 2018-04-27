@@ -5,10 +5,13 @@ import Prelude
 import Data.Monoid (mempty)
 import Data.Set (Set)
 
-import Lens (class HasKeysDown)
+import Lens (class HasKeysDown, _keysDown)
 
 import Optic.Lens (lens)
+import Optic.Getter ((^.))
 import Optic.Types (Lens')
+
+import PsGame.Utils ((∈))
 
 newtype KeyCode =
   KeyCode String
@@ -35,3 +38,7 @@ initialInputsState =
   InputsState
   { keysDown: mempty
   }
+
+keyDown ∷ KeyCode → InputsState → Boolean
+keyDown keyCode inputsState =
+  keyCode ∈ (inputsState^._keysDown)

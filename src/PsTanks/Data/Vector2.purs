@@ -1,13 +1,17 @@
-module PsTanks.Vector2 where
+module PsTanks.Data.Vector2 where
 
 import Prelude
 
 import Lens (class HasX, class HasY, _x, _y)
 
+import Math (cos, sin)
+
 import Optic.Getter ((^.))
 import Optic.Lens (lens)
 import Optic.Setter ((+~), (*~))
 import Optic.Types (Lens')
+
+import PsTanks.Data.Angle (Radians(Radians))
 
 newtype Vector2 =
   Vector2
@@ -54,3 +58,9 @@ instance semiringVector2 ∷ Semiring Vector2 where
     , y: 1.0
     }
 
+polarToCartesian ∷ Number → Radians → Vector2
+polarToCartesian r (Radians φ) =
+  Vector2
+  { x: r * cos (-φ)
+  , y: r * sin (-φ)
+  }
