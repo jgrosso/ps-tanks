@@ -2,14 +2,14 @@ module PsTanks.Data.Vector2 where
 
 import Prelude
 
+import Data.Lens (lens)
+import Data.Lens.Getter ((^.))
+import Data.Lens.Setter ((+~), (*~))
+import Data.Lens.Types (Lens')
+
 import Lens (class HasX, class HasY, _x, _y)
 
 import Math (cos, sin)
-
-import Optic.Getter ((^.))
-import Optic.Lens (lens)
-import Optic.Setter ((+~), (*~))
-import Optic.Types (Lens')
 
 import PsTanks.Data.Angle (Radians(Radians))
 

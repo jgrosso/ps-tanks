@@ -2,14 +2,13 @@ module PsGame.InputsEvent where
 
 import Prelude
 
+import Data.Lens.Setter ((%~))
 import Data.Set (delete, insert)
 
 import DOM.Event.KeyboardEvent (code)
 import DOM.Event.Types (KeyboardEvent)
 
 import Lens (_keysDown)
-
-import Optic.Setter ((%~))
 
 import PsGame.InputsState (InputsState, KeyCode(KeyCode))
 

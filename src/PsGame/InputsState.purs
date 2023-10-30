@@ -2,14 +2,13 @@ module PsGame.InputsState where
 
 import Prelude
 
+import Data.Lens (lens)
+import Data.Lens.Getter ((^.))
+import Data.Lens.Types (Lens')
 import Data.Monoid (mempty)
 import Data.Set (Set)
 
 import Lens (class HasKeysDown, _keysDown)
-
-import Optic.Lens (lens)
-import Optic.Getter ((^.))
-import Optic.Types (Lens')
 
 import PsGame.Utils ((∈))
 

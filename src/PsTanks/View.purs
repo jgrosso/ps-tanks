@@ -11,14 +11,13 @@ import CSS.Transform (rotate, transform)
 
 import Data.Either (either)
 import Data.Foldable (for_)
+import Data.Lens.Core ((..))
+import Data.Lens.Getter ((^.))
 import Data.Newtype (unwrap)
 
 import DOM.Event.KeyboardEvent (eventToKeyboardEvent)
 
 import Lens (class HasImage, class HasPosition, class HasRotation, _bullets, _dimensions, _image, _player, _position, _rotation, _sourceUrl, _x, _y)
-
-import Optic.Core ((..))
-import Optic.Getter ((^.))
 
 import PsGame.InputsEvent (InputsEvent(KeyDown, KeyUp, Noop))
 
@@ -66,10 +65,10 @@ viewEntity entity =
   div
     ! style do
         position absolute
-        left $ (entity^._position.._x) # px
-        top $ -(entity^._position.._y) # px
+        left $ (entity^._position<<<_x) # px
+        top $ -(entity^._position<<<_y) # px
         transform $ rotate (toCssAngle (entity^._rotation))
     $ img
-        ! Html.width (show $ entity^._image.._dimensions.._x)
-        ! Html.height (show $ entity^._image.._dimensions.._y)
-        ! src (unwrap $ entity^._image.._sourceUrl)
+        ! Html.width (show $ entity^._image<<<_dimensions.._x)
+        ! Html.height (show $ entity^._image<<<dimensions<<<_y)
+        ! src (unwrap $ entity^._image<<<_sourceUrl)

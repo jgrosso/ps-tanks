@@ -2,15 +2,15 @@ module PsTanks.Image where
 
 import Prelude
 
-import Lens (class HasDimensions, class HasImage, class HasPosition, class HasSourceUrl, _dimensions, _image, _position, _x, _y)
+import Data.Lens (lens)
+import Data.Lens.Getter ((^.))
+import Data.Lens.Setter ((+~))
+import Data.Lens.Types (Lens')
 
-import Optic.Core ((..))
-import Optic.Getter ((^.))
-import Optic.Lens (lens)
-import Optic.Setter ((+~))
-import Optic.Types (Lens')
+import Lens (class HasDimensions, class HasImage, class HasPosition, class HasRotation, class HasSourceUrl, _dimensions, _image, _position, _rotation, _x, _y)
 
 import PsTanks.Data.Coordinate (Coordinate)
+import PsTanks.Data.Angle (class Angle, cos, sin)
 import PsTanks.Data.Dimensions (Dimensions)
 import PsTanks.Data.Url (Url)
 
@@ -50,7 +50,7 @@ bottomLeft ∷
   ⇒ entity
   → Coordinate
 bottomLeft entity =
-  entity^._position#_y +~ entity^._image.._dimensions.._y
+  entity^._position#_y +~ entity^._image<<<_dimensions<<<_y
 
 topRight ∷
   ∀ entity
@@ -59,7 +59,7 @@ topRight ∷
   ⇒ entity
   → Coordinate
 topRight entity =
-  entity^._position#_x +~ entity^._image.._dimensions.._x
+  entity^._position#_x +~ entity^._image<<<_dimensions<<<_x
 
 bottomRight ∷
   ∀ entity
@@ -68,8 +68,8 @@ bottomRight ∷
   ⇒ entity
   → Coordinate
 bottomRight entity =
-  entity^._position#_x +~ entity^._image.._dimensions.._x
-                   #_y +~ entity^._image.._dimensions.._y
+  entity^._position#_x +~ entity^._image<<<_dimensions<<<_x
+                   #_y +~ entity^._image<<<_dimensions<<<_y
 
 centerRight ∷
   ∀ entity
@@ -78,12 +78,58 @@ centerRight ∷
   ⇒ entity
   → Coordinate
 centerRight entity =
-  topRight entity#_y +~ (entity^._image.._dimensions.._y) / 2.0
+  topRight entity#_y +~ (entity^._image<<<_dimensions<<<_y) / 2.0
 
 -- TODO Rename
 -- TODO Handle rotation
--- getCoordinate ∷ Vertical → Horizontal → entity -> Coordinate
--- getCoordinate Bottom Left = todo
--- getCoordinate Bottom Right = todo
--- getCoordinate Middle Left = todo
--- …
+-- getCoordinate ∷
+--   ∀ entity
+--   . HasImage entity Image
+--   ⇒ HasPosition entity Coordinate
+--   ⇒ Vertical
+--   → Horizontal
+--   → entity
+--   → Coordinate
+-- getCoordinate vertical horizontal entity = _
+
+data Horizontal
+  = HorizontalCenter
+  | Left
+  | Right
+
+data Vertical
+  = Bottom
+  | Top
+  | VerticalCenter
+
+-- TODO Rename
+-- TODO Handle rotation
+getHorizontalCoordinate ∷
+  ∀ angle entity
+  . Angle angle
+  ⇒ HasImage entity Image
+  ⇒ HasPosition entity Coordinate
+  ⇒ HasRotation entity angle
+  ⇒ Horizontal
+  → entity
+  → Number
+getHorizontalCoordinate HorizontalCenter entity =
+  (entity^._image<<<_dimensions<<<_x) / 2.0
+getHorizontalCoordinate Left entity =
+  getHorizontalCoordinate HorizontalCenter entity
+  + ((entity^._image<<<_dimensions<<<_x) * cos (entity^._rotation))
+  - ((entity^._image<<<_dimensions<<<_y) * sin (entity^._rotation))
+getHorizontalCoordinate _ _ = -1.0
+
+-- TODO Rename
+-- TODO Handle rotation
+getVerticalCoordinate ∷
+  ∀ entity
+  . HasImage entity Image
+  ⇒ HasPosition entity Coordinate
+  ⇒ Vertical
+  → entity
+  → Number
+getVerticalCoordinate VerticalCenter entity =
+  (entity^._image<<<_dimensions<<<_y) / 2.0
+getVerticalCoordinate _ _ = -1.0

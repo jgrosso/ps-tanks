@@ -3,14 +3,12 @@ module PsTanks.Event where
 import Prelude
 
 import Data.Array (cons)
+import Data.Lens.Getter ((^.))
+import Data.Lens.Setter ((%~), (+~))
 
 import Lens (_bullets, _player, _position, _rotation)
 
-import Optic.Core ((..))
-import Optic.Getter ((^.))
-import Optic.Setter ((%~), (+~))
-
-import PsTanks.Data.Angle (Degrees, deg, degreesToRadians)
+import PsTanks.Data.Angle (Degrees, deg, toRadians)
 import PsTanks.Data.Coordinate (Coordinate(Coordinate))
 import PsTanks.Data.Dimensions (Dimensions(Dimensions))
 import PsTanks.Data.Url (Url(Url))
@@ -58,7 +56,7 @@ update FireBullet state =
         , sourceUrl: Url "./img/bullet.png"
         }
       , position: centerRight $ state^._player
-      , rotation: state^._player.._rotation
+      , rotation: state^._player<<<_rotation
       }
   in
     noEffects $
@@ -73,7 +71,7 @@ update MoveBullets state =
         bulletPositionΔ :: Coordinate
         bulletPositionΔ =
           Coordinate $
-            polarToCartesian bulletMoveSpeed (degreesToRadians $ bullet^._rotation)
+            polarToCartesian bulletMoveSpeed (toRadians $ bullet^._rotation)
       in
         bullet#_position +~ bulletPositionΔ
 update (PlayerRotate rotateDirection) state =
@@ -89,7 +87,7 @@ update (PlayerRotate rotateDirection) state =
       sign * playerRotateSpeed # deg
   in
     noEffects $
-      state#_player.._rotation +~ playerRotationΔ
+      state#_player<<<_rotation +~ playerRotationΔ
 update (PlayerTranslate translateDirection) state =
   let
     sign ∷ Number
@@ -101,7 +99,7 @@ update (PlayerTranslate translateDirection) state =
     playerPositionΔ ∷ Coordinate
     playerPositionΔ =
       Coordinate $
-        polarToCartesian (sign * playerMoveSpeed) (degreesToRadians $ state^._player.._rotation)
+        polarToCartesian (sign * playerMoveSpeed) (toRadians $ state^._player<<<_rotation)
   in
     noEffects $
-      state#_player.._position +~ playerPositionΔ
+      state#_player<<<_position +~ playerPositionΔ

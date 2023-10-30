@@ -2,6 +2,9 @@ module PsTanks.State where
 
 import Prelude
 
+import Data.Lens (lens)
+import Data.Lens.Types (Lens')
+
 import Lens (class HasBullets, class HasImage, class HasPlayer, class HasPosition, class HasRotation)
 
 import PsTanks.Data.Angle (Degrees, deg)
@@ -10,9 +13,6 @@ import PsTanks.Data.Dimensions (Dimensions(Dimensions))
 import PsTanks.Data.Url (Url(Url))
 import PsTanks.Data.Vector2 (Vector2(Vector2))
 import PsTanks.Image (Image(Image))
-
-import Optic.Lens (lens)
-import Optic.Types (Lens')
 
 newtype Bullet =
   Bullet

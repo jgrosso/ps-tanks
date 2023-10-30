@@ -4,17 +4,15 @@ import Prelude
 
 import Data.Array (catMaybes, cons)
 import Data.Foldable (foldl)
+import Data.Lens (lens)
+import Data.Lens.Getter ((^.))
+import Data.Lens.Setter ((%~), (.~), (+~))
+import Data.Lens.Types (Lens')
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Monoid (mempty)
 import Data.Tuple (Tuple(Tuple))
 
 import Lens (class HasAction, class HasControls, class HasCooldown, class HasEvent, class HasTrigger, _1, _2, _action, _controls, _cooldown, _elapsedTime, _event, _expectedTime, _trigger)
-
-import Optic.Core ((..))
-import Optic.Getter ((^.))
-import Optic.Lens (lens)
-import Optic.Setter ((%~), (.~), (+~))
-import Optic.Types (Lens')
 
 import PsGame.Data.Cooldown (Cooldown)
 import PsGame.Data.Milliseconds (Milliseconds)
@@ -88,25 +86,25 @@ update tickTime inputsState controlsState =
   where
     tickCooldown ∷ Control gameEvent → Control gameEvent
     tickCooldown =
-      _cooldown.._elapsedTime +~ tickTime
+      _cooldown<<<_elapsedTime +~ tickTime
 
     resetCooldown ∷ Control gameEvent → Control gameEvent
     resetCooldown =
-      _cooldown.._elapsedTime .~ zero
+      _cooldown<<<_elapsedTime .~ zero
 
     handleTrigger ∷ Control gameEvent → Tuple (Control gameEvent) (Maybe gameEvent)
     handleTrigger control =
       let
         timerExpired ∷ Boolean
         timerExpired =
-          (control^._cooldown.._elapsedTime) ≥ (control^._cooldown.._expectedTime)
+          (control^._cooldown<<<_elapsedTime) ≥ (control^._cooldown<<<_expectedTime)
 
         triggerFired ∷ Boolean
         triggerFired =
-          control^._action.._trigger $ inputsState
+          control^._action<<<_trigger $ inputsState
       in
         if timerExpired ∧ triggerFired
-        then Tuple (resetCooldown control) (Just $ control^._action.._event)
+        then Tuple (resetCooldown control) (Just $ control^._action<<<_event)
         else Tuple control Nothing
 
     handleTriggers ∷ Array (Control gameEvent) → Tuple (Array (Control gameEvent)) (Array gameEvent)
@@ -115,11 +113,10 @@ update tickTime inputsState controlsState =
         Tuple controls' events =
           foldl
             (\acc control →
-              let
-                Tuple control' event = handleTrigger control
+              let Tuple control' event = handleTrigger control
               in
                 acc#_1 %~ cons control'
-                  #_2 %~ cons event)
+                   #_2 %~ cons event)
             mempty
             controls
       in

@@ -6,7 +6,22 @@ import CSS.Size as CSS
 
 import Data.Newtype (class Newtype, unwrap)
 
-import Math (pi)
+import Math as Math
+
+π ∷ Number
+π = Math.pi
+
+class Angle a where
+  toDegrees ∷ a → Degrees
+  toRadians ∷ a → Radians
+
+cos ∷ ∀ a. Angle a ⇒ a → Number
+cos =
+  toRadians >>> unwrap >>> Math.cos
+
+sin ∷ ∀ a. Angle a ⇒ a → Number
+sin =
+  toRadians >>> unwrap >>> Math.sin
 
 class ToCssAngle a b | a → b where
   toCssAngle ∷ a → CSS.Angle b
@@ -19,6 +34,14 @@ derive newtype instance euclideanRingDegrees ∷ EuclideanRing Degrees
 derive newtype instance ringDegrees ∷ Ring Degrees
 derive newtype instance semiringDegrees ∷ Semiring Degrees
 derive instance newtypeDegrees ∷ Newtype Degrees _
+
+instance angleDegrees ∷ Angle Degrees where
+  toDegrees ∷ Degrees → Degrees
+  toDegrees = id
+
+  toRadians ∷ Degrees → Radians
+  toRadians θ =
+    unwrap θ * π / 180.0 # rad
 
 instance toCssAngleDegrees ∷ ToCssAngle Degrees CSS.Deg where
   toCssAngle ∷ Degrees → CSS.Angle CSS.Deg
@@ -34,6 +57,14 @@ newtype Radians =
 derive newtype instance semiringRadians ∷ Semiring Radians
 derive instance newtypeRadians ∷ Newtype Radians _
 
+instance angleRadians ∷ Angle Radians where
+  toDegrees ∷ Radians → Degrees
+  toDegrees θ =
+    unwrap θ * 180.0 / π # deg
+
+  toRadians ∷ Radians → Radians
+  toRadians = id
+
 instance toCssAngleRadians ∷ ToCssAngle Radians CSS.Rad where
   toCssAngle ∷ Radians → CSS.Angle CSS.Rad
   toCssAngle =
@@ -42,10 +73,3 @@ instance toCssAngleRadians ∷ ToCssAngle Radians CSS.Rad where
 rad ∷ Number → Radians
 rad = Radians
 
-degreesToRadians ∷ Degrees → Radians
-degreesToRadians (Degrees degrees) =
-  degrees * pi / 180.0 # rad
-
-radiansToDegrees ∷ Radians → Degrees
-radiansToDegrees (Radians radians) =
-  radians * 180.0 / pi # deg

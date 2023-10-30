@@ -2,12 +2,12 @@ module PsTanks.Data.Coordinate where
 
 import Prelude
 
-import Lens (class HasX, class HasY, _x, _y)
+import Data.Lens (lens)
+import Data.Lens.Getter ((^.))
+import Data.Lens.Setter ((.~))
+import Data.Lens.Types (Lens')
 
-import Optic.Getter ((^.))
-import Optic.Lens (lens)
-import Optic.Setter ((.~))
-import Optic.Types (Lens')
+import Lens (class HasX, class HasY, _x, _y)
 
 import PsTanks.Data.Vector2 (Vector2)
 

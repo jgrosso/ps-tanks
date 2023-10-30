@@ -2,19 +2,17 @@ module PsGame where
 
 import Prelude
 
-import Lens (class HasControlsState, class HasGameState, class HasInputsState, _controlsState, _gameState, _inputsState)
-
-import Control.Monad.Aff (Aff)
-import Control.Monad.Eff (Eff)
+import Effect (Effect)
 
 import Data.Foldable (foldl)
+import Data.Lens (lens)
+import Data.Lens.Getter ((^.))
+import Data.Lens.Setter ((.~), (%~))
+import Data.Lens.Types (Lens')
 import Data.Maybe (Maybe)
 import Data.Tuple (Tuple(Tuple))
 
-import Optic.Getter ((^.))
-import Optic.Lens (lens)
-import Optic.Setter ((.~), (%~))
-import Optic.Types (Lens')
+import Lens (class HasControlsState, class HasGameState, class HasInputsState, _controlsState, _gameState, _inputsState)
 
 import PsGame.Controls (Control, ControlsState)
 import PsGame.Controls as Controls
@@ -22,28 +20,14 @@ import PsGame.Data.Milliseconds (Milliseconds(Milliseconds))
 import PsGame.InputsEvent (InputsEvent, foldpInputsEvent)
 import PsGame.InputsState (InputsState, initialInputsState)
 
-import Pux (CoreEffects, EffModel, noEffects)
-import Pux as Pux
-import Pux.DOM.HTML (HTML)
-import Pux.Renderer.React (renderToDOM)
-
-import Signal.Time (every, millisecond)
-
-import Text.Smolder.Markup (mapEvent)
-
 type GameControls gameEvent =
   Array (Control gameEvent)
 type GameDeriveEvents gameEvent =
   InputsState → Array gameEvent
 type GameUpdate gameEvent gameState effects =
-  gameEvent → gameState → EffModel gameState gameEvent effects
-type GameView gameState =
-  gameState → HTML InputsEvent
-
-type Effect' event effects =
-  Aff (CoreEffects effects) (Maybe event)
-type Effect gameEvent e =
-  Effect' (Event gameEvent) e
+  gameEvent → gameState → Tuple gameState (Array (Aff (Maybe gameEvent)))
+type GameView gameState gameEvent =
+  gameState → Html gameEvent
 
 newtype State gameEvent gameState =
   State
@@ -78,23 +62,18 @@ data Event gameEvent
   | InputsEvent InputsEvent
   | Tick Milliseconds
 
-gameEffectToEffect ∷ ∀ gameEvent effects. Effect' gameEvent effects → Effect gameEvent effects
-gameEffectToEffect =
-  map (map GameEvent)
-
-makeFoldp
+makeUpdate
   ∷ ∀ gameEvent gameState effects
   . GameDeriveEvents gameEvent
   → GameUpdate gameEvent gameState effects
   → Event gameEvent
   → State gameEvent gameState
-  → EffModel (State gameEvent gameState) (Event gameEvent) effects
-makeFoldp _ gameUpdate (GameEvent gameEvent) state =
+  → Tuple gameState (Array (Aff (Maybe gameEvent)))
+makeUpdate _ gameUpdate (GameEvent gameEvent) state =
   updateGameState gameUpdate state [gameEvent]
-makeFoldp _ _ (InputsEvent inputsEvent) state =
-  noEffects $
-    state#_inputsState %~ foldpInputsEvent inputsEvent
-makeFoldp gameDeriveEvents gameUpdate (Tick tickTime) state =
+makeUpdate _ _ (InputsEvent inputsEvent) state =
+  Tuple (state#_inputsState %~ foldpInputsEvent inputsEvent) []
+makeUpdate gameDeriveEvents gameUpdate (Tick tickTime) state =
   let
     Tuple controlsState controlsGameEvents =
       Controls.update tickTime (state^._inputsState) (state^._controlsState)
@@ -108,30 +87,20 @@ applyGameEventsToGameState
   . GameUpdate gameEvent gameState effects
   → gameState
   → Array gameEvent
-  → EffModel gameState gameEvent effects
+  → Tuple gameState (Array (Aff (Maybe gameEvent)))
 applyGameEventsToGameState gameUpdate gameState =
   foldl
     (\acc gameEvent →
-      let
-        { state: gameState'
-        , effects: gameEffects
-        } =
-          gameUpdate gameEvent acc.state
-      in
-        acc
-          { state = gameState'
-          , effects = acc.effects <> gameEffects
-          })
-    { state: gameState
-    , effects: []
-    }
+      let Tuple gameState' gameEffects = gameUpdate gameEvent acc.state
+      in (Tuple gameState' (acc.effects <> gameEffects)))
+    (Tuple gameState [])
 
 updateGameState
   ∷ ∀ gameEvent gameState effects
   . GameUpdate gameEvent gameState effects
   → State gameEvent gameState
   → Array gameEvent
-  → EffModel (State gameEvent gameState) (Event gameEvent) effects
+  → Tuple gameState (Array (Aff (Maybe gameEvent)))
 updateGameState gameUpdate state gameEvents =
   let
     { state: gameState
@@ -149,9 +118,9 @@ makeView
   ∷ ∀ gameEvent gameState
   . GameView gameState
   → State gameEvent gameState
-  → HTML (Event gameEvent)
+  → Html gameEvent
 makeView gameView state =
-  mapEvent (InputsEvent <<< _) $ gameView (state^._gameState)
+  gameView (state^._gameState)
 
 makeInitialState ∷ ∀ gameEvent gameState. Array (Control gameEvent) → gameState → State gameEvent gameState
 makeInitialState gameControls initialGameState =
@@ -161,8 +130,6 @@ makeInitialState gameControls initialGameState =
   , inputsState: initialInputsState
   }
 
-type Game effects = Eff (CoreEffects effects) Unit
-
 start
   ∷ ∀ gameEvent gameState effects
   . gameState
@@ -170,15 +137,14 @@ start
   → GameDeriveEvents gameEvent
   → GameUpdate gameEvent gameState effects
   → GameView gameState
-  → Eff (CoreEffects effects) Unit
+  → Effect Unit
 start gameInitialState gameControls gameDeriveEvents gameUpdate gameView =
   do
-    let tickTime = 10.0 * millisecond
-    let tick = every tickTime $> Tick (Milliseconds tickTime)
-    app ← Pux.start
-      { initialState: makeInitialState gameControls gameInitialState
+    mount_ (QuerySelector "#app")
+      { subscribe: []
       , view: makeView gameView
-      , foldp: makeFoldp gameDeriveEvents gameUpdate
-      , inputs: [tick]
+      , init: makeInitialState gameControls gameInitialState
+      , update: makeUpdate gameDeriveEvents gameUpdate
       }
-    renderToDOM "#app" app.markup app.input
+    let tickTime = 10
+    void $ setInterval tickTime (send id (Tick tickTime))

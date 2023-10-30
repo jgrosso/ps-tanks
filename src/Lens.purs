@@ -1,9 +1,8 @@
 module Lens where
 
+import Data.Lens (lens)
+import Data.Lens.Types (Lens')
 import Data.Tuple (Tuple(Tuple))
-
-import Optic.Lens (lens)
-import Optic.Types (Lens')
 
 class Has_1 a r | a → r where
   _1 ∷ Lens' a r

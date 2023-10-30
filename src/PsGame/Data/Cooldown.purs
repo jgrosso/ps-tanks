@@ -2,10 +2,10 @@ module PsGame.Data.Cooldown where
 
 import Prelude
 
-import Lens (class HasElapsedTime, class HasExpectedTime)
+import Data.Lens (lens)
+import Data.Lens.Types (Lens')
 
-import Optic.Lens (lens)
-import Optic.Types (Lens')
+import Lens (class HasElapsedTime, class HasExpectedTime)
 
 import PsGame.Data.Milliseconds (Milliseconds(Milliseconds))
 

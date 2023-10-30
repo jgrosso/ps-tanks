@@ -1,3 +1,4 @@
+.DS_Store
 /bower_components/
 /node_modules/
 /.pulp-cache/
@@ -7,5 +8,4 @@
 /.psc*
 /.purs*
 /.psa*
-/yarn-error.log
-/bundle.js
+/.spago
